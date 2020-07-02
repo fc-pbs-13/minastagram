@@ -16,12 +16,12 @@ import os
 import environ
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-print(BASE_DIR)
 
 env_file = os.path.dirname(os.path.dirname(BASE_DIR)) + '/.env'
-print(env_file)
+
 environ.Env.read_env(env_file=env_file)
 
+AUTH_USER_MODEL = 'users.MyUser'
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
@@ -45,7 +45,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-
+    'users',
 ]
 
 MIDDLEWARE = [
