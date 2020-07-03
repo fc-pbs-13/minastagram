@@ -1,3 +1,7 @@
 # minastagram
 
-https://docs.google.com/presentation/d/1FV1Fwzfy0B9Bzxmqr9qpidJFR9ETnhH5vTeXtp66KKg/edit?usp=sharing
+instagram 기능명세
+https://bit.ly/2NQdrSr
+
+minastagram API
+https://kangmina92.docs.apiary.io/#
