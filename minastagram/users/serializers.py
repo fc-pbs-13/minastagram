@@ -1,19 +1,30 @@
-import serializers as serializers
-from django.contrib.auth import get_user_model
-
-User = get_user_model()
+from rest_framework import serializers
+from users.models import User, Profile, Relation
 
 
 class UserSerializers(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['id', 'email', 'password']
+        fields = ['id', 'username', 'password']
+        extra_kwargs = {'password': {'write_only': True}}
 
     def create(self, validated_data):
-        user = User(
-            email=validated_data['username'],
-            password=validated_data['password'],
-        )
-        user.set_password(validated_data['password'])
-        user.save()
-        return user
+        return User.objects.create_user(**validated_data)
+
+
+class ProfileSerializer(serializers.ModelSerializer):
+    user = serializers.StringRelatedField()
+
+    class Meta:
+        model = Profile
+        fields = ('user', 'nickname', 'introduce')
+
+    def __str__(self):
+        return self.user
+
+
+class RelationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Relation
+        fields = ('id', 'from_user', 'to_user', 'related_type')
+
