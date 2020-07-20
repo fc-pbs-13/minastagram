@@ -143,21 +143,22 @@ class RelationTest(APITestCase):
     def test_update(self):
         self.client.force_authenticate(user=self.user)
         user2 = User.objects.create_user(
-            username='testUser2',
+            username='testUser3',
             password='1111'
         )
-        data = {
-            'from_user': self.user.id,
-            'to_user': user2.id,
-            'related_type': 'b'
-        }
-        response = self.client.post(f'/users/{user2.id}/relation/', data=data)
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        # data = {
+        #     'from_user': self.user.id,
+        #     'to_user': user2.id,
+        #     'related_type': 'b'
+        # }
+        # response = self.client.post(f'/users/{user2.id}/relation/', data=data)
+        # self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        # print('Relation:', response.data)
+        relation = baker.make('users.Relation', from_user=self.user, to_user=user2, related_type='b')
 
         data2 = {
             'related_type': 'f'
         }
-        response = self.client.patch(f'/users/{user2.id}/relation/{self.user.id}/', data=data2)
-        print('rerererererere', response)
+        response = self.client.patch(f'/users/{user2.id}/relation/{relation.id}/', data=data2)
+        print('rerererererere', response.data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-

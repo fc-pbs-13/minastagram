@@ -119,13 +119,15 @@ class CommentTestCode(APITestCase):
         user = self.user
         self.client.force_authenticate(user=user)
         post = self.post
-        data = {"text": "tttttttt"}
+        data = {
+
+            "text": "tttttttt"
+        }
         response = self.client.post(f'/posts/{post.pk}/comments/', data=data)
-        print('tttttttt', response)
+        print('tttttttt', response.data)
         # response = self.client.post(f'/comments/{self.comment.pk}/reply/', data=data)
 
         self.assertEqual(response.data['text'], data['text'])
-        self.fail()
 
     def test_comment_list(self):
         user = self.user
@@ -136,7 +138,7 @@ class CommentTestCode(APITestCase):
 
         for a, b in zip(response.data, self.queryset):
             self.assertEqual(a['text'], b.text)
-            self.assertEqual(a['author'], b.author.username)
+            self.assertEqual(a['author'], b.author_id)
 
     def test_comment_destroy(self):
         user = self.user
@@ -152,7 +154,7 @@ class CommentTestCode(APITestCase):
 class ReplyTestCode(APITestCase):
 
     def setUp(self):
-        self.user = User(username='mina', password='1234')
+        self.user = User(username='mina', password='1234',)
         self.user.set_password(self.user.password)
         self.user.save()
 
@@ -166,11 +168,8 @@ class ReplyTestCode(APITestCase):
         self.client.force_authenticate(user=self.user)
         data = {
             # 'parent': self.comment.pk,
-            'author': self.user.pk,
+            # 'author': self.user.author_id,
             'text': 'RRRRRRRR',
         }
 
         response = self.client.post(f'/comments/{self.comment.pk}/reply/', data=data)
-        print('EEEEEEE:', response)
-
-        self.fail()
