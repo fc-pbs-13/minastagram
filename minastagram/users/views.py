@@ -62,12 +62,9 @@ class ProfileViewSet(mixins.RetrieveModelMixin, mixins.UpdateModelMixin, Generic
 
 class RelationViewSet(ModelViewSet):
     """
-     user간의 릴레이션을 만들어야 한다.
-     /relation/
-
-     /user/1/relation >> 특정 유저의가 팔로윙 팔로워를 to user- 미나님
-     request.user > 영훈
-
+    - 생성하면 from_user, to_user, related_type 받고 생성,
+    - 삭제는 삭제
+    - 업데이트는 기존에 있는 Relation을 가져와서, related_type 만 바꾼다.
    """
     queryset = Relation.objects.all()
     serializer_class = RelationSerializer

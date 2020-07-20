@@ -28,3 +28,8 @@ class RelationSerializer(serializers.ModelSerializer):
         model = Relation
         fields = ('id', 'from_user', 'to_user', 'related_type')
 
+    def perform_create(self, serializer):
+        serializer.save()
+
+    def update(self, instance, validated_data):
+        return super().update(instance, validated_data)

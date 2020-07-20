@@ -23,6 +23,8 @@ comment_router = routers.NestedSimpleRouter(router, r'comments', lookup='comment
 comment_router.register(r'reply', CommentViewSet)
 
 
+
+
 urlpatterns = (
     url(r'^', include(router.urls)),
     url(r'^', include(users_router.urls)),

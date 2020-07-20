@@ -19,19 +19,13 @@ class User(AbstractUser):
     @property
     def follow(self):
         # 내가 팔로우를 건 유저
-        user = User.objects.filter(
-            to_users_relation__from_user=self,
-            to_users_relation__related_type='f'
-        )
+        user = User.objects.filter(to_users_relation__from_user=self, to_users_relation__related_type='f')
         return user
 
     @property
     def follower(self):
         # 나를 팔로우를 건 유저
-        user = User.objects.filter(
-            from_users_relation__to_user=self,
-            from_users_relation__related_type='f'
-        )
+        user = User.objects.filter(from_users_relation__to_user=self, from_users_relation__related_type='f')
         return user
 
 
@@ -42,29 +36,13 @@ class Profile(models.Model):
 
 
 class Relation(models.Model):
-    CHOICE_RELATIONS_TYPE = (
-        ('f', 'follow'),
-        ('b', 'block'),
-    )
-    from_user = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        related_name='from_user_relations',
-        related_query_name='from_users_relation',
-    )
-    to_user = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        related_name='to_user_relations',
-        related_query_name='to_users_relation',
-    )
-    related_type = models.CharField(
-        choices=CHOICE_RELATIONS_TYPE,
-        max_length=10,
-    )
-    created_at = models.DateTimeField(
-        auto_now_add=True,
-    )
+    CHOICE_RELATIONS_TYPE = (('f', 'follow'), ('b', 'block'),)
+    from_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='from_user_relations',
+                                  related_query_name='from_users_relation', )
+    to_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='to_user_relations',
+                                related_query_name='to_users_relation', )
+    related_type = models.CharField(choices=CHOICE_RELATIONS_TYPE, max_length=10, )
+    created_at = models.DateTimeField(auto_now_add=True, )
 
     class Meta:
         unique_together = (
@@ -74,4 +52,9 @@ class Relation(models.Model):
 
     def save(self, force_insert=False, force_update=False, using=None,
              update_fields=None):
+        pass
+        return super().save(force_insert=False, force_update=False, using=None,
+                            update_fields=None)
 
+    def delete(self, using=None, keep_parents=False):
+        return super().delete(using=None, keep_parents=False)

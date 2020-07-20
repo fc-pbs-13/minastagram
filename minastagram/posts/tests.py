@@ -121,9 +121,11 @@ class CommentTestCode(APITestCase):
         post = self.post
         data = {"text": "tttttttt"}
         response = self.client.post(f'/posts/{post.pk}/comments/', data=data)
+        print('tttttttt', response)
         # response = self.client.post(f'/comments/{self.comment.pk}/reply/', data=data)
 
         self.assertEqual(response.data['text'], data['text'])
+        self.fail()
 
     def test_comment_list(self):
         user = self.user
