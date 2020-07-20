@@ -117,8 +117,6 @@ class ProfileTestCase(APITestCase):
         response = self.client.patch(f'/profile/{user.pk}/', data=data)
 
         self.assertEqual(response.data['introduce'], data['introduce'])
-<<<<<<< Updated upstream
-=======
 
 
 class RelationTest(APITestCase):
@@ -164,4 +162,3 @@ class RelationTest(APITestCase):
         response = self.client.patch(f'/users/{user2.id}/relation/{relation.id}/', data=data2)
         print('rerererererere', response.data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
->>>>>>> Stashed changes
