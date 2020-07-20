@@ -124,10 +124,9 @@ class CommentTestCode(APITestCase):
             "text": "tttttttt"
         }
         response = self.client.post(f'/posts/{post.pk}/comments/', data=data)
-<<<<<<< Updated upstream
-=======
+
         print('tttttttt', response.data)
->>>>>>> Stashed changes
+
         # response = self.client.post(f'/comments/{self.comment.pk}/reply/', data=data)
 
         self.assertEqual(response.data['text'], data['text'])
