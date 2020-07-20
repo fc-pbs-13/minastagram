@@ -39,7 +39,7 @@ class CommentViewSet(viewsets.ModelViewSet):
         if 'comment_pk' in self.kwargs:
             comment = get_object_or_404(Comment, pk=self.kwargs['comment_pk'])
             serializer.save(
-                # author=self.request.user,
+                author=self.request.user,
                 parent=comment
             )
         elif 'post_pk' in self.kwargs:

@@ -42,6 +42,7 @@ class Profile(models.Model):
 
 
 class Relation(models.Model):
+<<<<<<< Updated upstream
     CHOICE_RELATIONS_TYPE = (
         ('f', 'follow'),
         ('b', 'block'),
@@ -65,6 +66,15 @@ class Relation(models.Model):
     created_at = models.DateTimeField(
         auto_now_add=True,
     )
+=======
+    CHOICE_RELATIONS_TYPE = (('f', 'follow'), ('b', 'block'),)
+    from_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='from_user_relations',
+                                  related_query_name='from_users_relation')
+    to_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='to_user_relations',
+                                related_query_name='to_users_relation')
+    related_type = models.CharField(choices=CHOICE_RELATIONS_TYPE, max_length=10)
+    created_at = models.DateTimeField(auto_now_add=True)
+>>>>>>> Stashed changes
 
     class Meta:
         unique_together = (

@@ -16,7 +16,7 @@ class CommentSerializer(ModelSerializer):
     class Meta:
         model = Comment
         fields = ['id', 'author', 'text', 'created_date', 'post', 'reply', ]
-        read_only_fields = ('post',)
+        read_only_fields = ('post', 'author',)
 
     def get_reply(self, instance):
         # recursive

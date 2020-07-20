@@ -22,7 +22,10 @@ posts_router.register(r'comments', CommentViewSet)
 comment_router = routers.NestedSimpleRouter(router, r'comments', lookup='comment')
 comment_router.register(r'reply', CommentViewSet)
 
+<<<<<<< Updated upstream
 
+=======
+>>>>>>> Stashed changes
 urlpatterns = (
     url(r'^', include(router.urls)),
     url(r'^', include(users_router.urls)),

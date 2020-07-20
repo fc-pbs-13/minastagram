@@ -71,5 +71,3 @@ class RelationViewSet(ModelViewSet):
    """
     queryset = Relation.objects.all()
     serializer_class = RelationSerializer
-
-
