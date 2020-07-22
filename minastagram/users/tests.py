@@ -101,10 +101,10 @@ class ProfileTestCase(APITestCase):
             'password': '1234'
         }
         login_response = self.client.post('/users/login/', data=data)
-        print('ddddddddddd', login_response)
+        # print('ddddddddddd', login_response)
 
         response = self.client.get(f'/profile/{self.user.pk}/')
-        print('pppppppppp:', response)
+        # print('pppppppppp:', response)
 
         self.assertEqual(data['username'], response.data['user'])
 
@@ -140,6 +140,21 @@ class RelationTest(APITestCase):
         response = self.client.post(f'/users/{self.user1.id}/relation/', data=data)
         self.assertTrue(response.status_code, status.HTTP_201_CREATED)
 
+    def test_destroy(self):
+        self.client.force_authenticate(self.user)
+        data = {
+            'from_user': self.user.id,
+            'to_user': self.user1.id,
+            'related_type': 'f'
+        }
+        response_post = self.client.post(f'/users/{self.user1.id}/relation/', data=data)
+        self.assertTrue(response_post.status_code, status.HTTP_201_CREATED)
+        a = response_post.data['id']
+        # print('dadaadada', a)
+
+        response = self.client.delete(f'/users/{self.user1.id}/relation/{a}/')
+        self.assertTrue(response.status_code, status.HTTP_201_CREATED)
+
     def test_update(self):
         self.client.force_authenticate(user=self.user)
         user2 = User.objects.create_user(
@@ -160,5 +175,40 @@ class RelationTest(APITestCase):
             'related_type': 'f'
         }
         response = self.client.patch(f'/users/{user2.id}/relation/{relation.id}/', data=data2)
-        print('rerererererere', response.data)
+        # print('rerererererere', response.data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_follow(self):
+        from_user = baker.make('users.User')
+        to_user_size = 2
+        to_users = baker.make('users.User', _quantity=to_user_size)
+        for to_user in to_users:
+            baker.make('users.Relation', from_user=from_user, to_user=to_user, related_type='f')
+
+        request_user = self.user
+        self.client.force_authenticate(user=request_user)
+        response = self.client.get(f'/users/{from_user.id}/follow/')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        self.assertEqual(len(response.data), to_user_size)
+
+        for response_to_user, to_user in zip(response.data, to_users):
+            self.assertEqual(response_to_user['id'], to_user.id)
+            self.assertEqual(response_to_user['username'], to_user.username)
+
+    def test_follower(self):
+        to_user = baker.make('users.User')
+        from_user_size = 2
+        from_users = baker.make('users.User', _quantity=from_user_size)
+        for from_user in from_users:
+            baker.make('users.Relation', from_user=from_user, to_user=to_user, related_type='f')
+
+        request_user = self.user
+        self.client.force_authenticate(user=request_user)
+
+        response = self.client.get(f'/users/{to_user.id}/follower/')
+        print('ewewewewewewe', response)
+
+        self.assertEqual(len(response.data), from_user_size)
+
+        self.fail()
