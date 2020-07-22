@@ -1,14 +1,23 @@
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import User, AbstractUser
 from django.db import models
+from django.utils.translation import gettext_lazy as _
+
+# 어떤 값이 들어올지 모름
+# *args = 함수에 변수가 튜플형태로 입력 a(1,2,3,4,) => (1,2,3,4)
+# **kwargs = 딕셔너리 형태로 입력 b(a=1, b=2, c=3) => { a:1, b:2, c:3}
+from django.db.models import F
+from rest_framework.generics import get_object_or_404
 
 
 class User(AbstractUser):
+    # 32비트 정수형 필드
     follow = models.IntegerField(default=0)
     follower = models.IntegerField(default=0)
 
     def save(self, *args, **kwargs):
         is_created = self.id is None
+        # None?
         user = super().save()
 
         if is_created:
@@ -16,7 +25,7 @@ class User(AbstractUser):
 
         return user
 
-    @property
+    @property  # get 메서드를 표현 = @property / set 메서드를 표현 = @method_name.setter
     def follow(self):
         # 내가 팔로우를 건 유저
         user = User.objects.filter(to_users_relation__from_user=self, to_users_relation__related_type='f')
@@ -33,33 +42,17 @@ class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, )
     nickname = models.CharField(max_length=15, )
     introduce = models.CharField(max_length=100, null=True, )
+    follow_count = models.IntegerField(default=0)
+    follower_count = models.IntegerField(default=0)
 
 
 class Relation(models.Model):
-    CHOICE_RELATIONS_TYPE = (
-        ('f', 'follow'),
-        ('b', 'block'),
-    )
-    from_user = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        related_name='from_user_relations',
-        related_query_name='from_users_relation',
-    )
-    to_user = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        related_name='to_user_relations',
-        related_query_name='to_users_relation',
-    )
-    related_type = models.CharField(
-        choices=CHOICE_RELATIONS_TYPE,
-        max_length=10,
-    )
-    created_at = models.DateTimeField(
-        auto_now_add=True,
-    )
-    CHOICE_RELATIONS_TYPE = (('f', 'follow'), ('b', 'block'),)
+
+    # class choice_relations_type(models.TextChoices):
+    #     FOLLOW = 'f', _('follow')
+    #     BLOCK = 'b', _('block')
+
+    CHOICE_RELATIONS_TYPE = (('f', 'follow'), ('b', 'block'))
     from_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='from_user_relations',
                                   related_query_name='from_users_relation')
     to_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='to_user_relations',
@@ -73,11 +66,29 @@ class Relation(models.Model):
             ('to_user', 'from_user', 'related_type'),
         )
 
-    def save(self, force_insert=False, force_update=False, using=None,
-             update_fields=None):
-        pass
-        return super().save(force_insert=False, force_update=False, using=None,
-                            update_fields=None)
+    def save(self, *args, **kwargs):
+        # from_user = get_object_or_404(User, pk=self.from_user_id)
+        # to_user = get_object_or_404(User, pk=self.to_user_id)
 
-    def delete(self, using=None, keep_parents=False):
-        return super().delete(using=None, keep_parents=False)
+        created = self.id is None
+
+        super().save(*args, **kwargs)
+
+        if created and self.related_type == 'f':
+            # 팔로우를 건 유저의 팔로윙 카운트 증가.
+            self.from_user.profile.follow_count = F('follow_count') + 1
+            self.to_user.profile.follower_count = F('follower_count') + 1
+            self.from_user.profile.save()
+            self.to_user.profile.save()
+
+    def delete(self, *args, **kwargs):
+        # from_user = get_object_or_404(User, pk=self.from_user_id)
+        # to_user = get_object_or_404(User, pk=self.to_user_id)
+
+        if self.related_type == 'f':
+            # 팔로우를 건 유저의 팔로윙 카운트 증가.
+            self.from_user.profile.follower_count = F('follower_count') - 1
+            self.to_user.profile.follow_count = F('follow_count') - 1
+            self.from_user.profile.save()
+            self.to_user.profile.save()
+        return super().save(*args, **kwargs)

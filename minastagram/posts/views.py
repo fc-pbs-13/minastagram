@@ -1,6 +1,7 @@
 from rest_framework import viewsets, mixins, status, serializers
 from rest_framework.decorators import action
 from rest_framework.generics import get_object_or_404
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
@@ -12,6 +13,7 @@ from users.models import User
 class PostViewSet(viewsets.ModelViewSet):
     queryset = Post.objects.all()
     serializer_class = PostSerializer
+    # permission_classes = (IsAuthenticated,)
 
     @action(detail=True, methods=['post'])
     def like_toggle(self, request, pk=None):
@@ -33,6 +35,7 @@ class PostViewSet(viewsets.ModelViewSet):
 class CommentViewSet(viewsets.ModelViewSet):
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
+    # permission_classes = (IsAuthenticated,)
 
     # 하드코딩
     def perform_create(self, serializer):

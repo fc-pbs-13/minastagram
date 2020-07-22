@@ -15,13 +15,13 @@ class CommentSerializer(ModelSerializer):
 
     class Meta:
         model = Comment
-        fields = ['id', 'author', 'text', 'created_date', 'post', 'reply', ]
+        fields = ['id', 'author', 'text', 'created_date', 'post', 'reply']
         read_only_fields = ('post', 'author',)
 
     def get_reply(self, instance):
         # recursive
-        serializer = self.__class__(instance.reply, many=True)
-        serializer.bind('', self)
+        serializer = self.__class__(instance.reply, many=True)  # __class__ 통해 직렬화가 이루어짐
+        serializer.bind('', self)  # 직렬화된 자식을 부모에게 (필드 인스턴스 - reply) 에 연결
         return serializer.data
 
 
@@ -33,6 +33,7 @@ class PostSerializer(ModelSerializer):
     class Meta:
         model = Post
         fields = ['id', 'owner', 'image', 'text', 'created_date', 'comment', 'like_users']
+        read_only_fields = ('like_users',)
 
     def get_like_users(self, obj):
         return obj.like_users.count()

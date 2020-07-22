@@ -2,6 +2,8 @@ from django.contrib.auth import get_user_model
 from rest_framework import status, mixins
 from rest_framework.authtoken.models import Token
 from rest_framework.decorators import action
+from rest_framework.generics import get_object_or_404
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet, GenericViewSet
 
@@ -14,6 +16,7 @@ User = get_user_model()
 class UserViewSet(ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializers
+    # permission_classes = (IsAuthenticated,)
 
     @action(detail=False, methods=['post'])
     def login(self, request):
@@ -35,36 +38,35 @@ class UserViewSet(ModelViewSet):
         }
         return Response(data, status=status.HTTP_204_NO_CONTENT)
 
-    @action(detail=False)
-    def follow(self, request):
-        # 내가 팔로우를 건 유저
-        # users = request.user.follow
-        # user = User.objects.first()
+    @action(detail=True)
+    def follow(self, request, pk=None):
+        # pk의 following
+        user = get_object_or_404(User, id=pk)
         users = User.objects.filter(
-            to_users_relation__from_user=self.request.user,
+            to_users_relation__from_user=user,
             to_users_relation__related_type='f'
         )
-
-        serializer = UserSerializers(users, many=True, )
+        serializer = UserSerializers(users, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    @action(detail=False)
-    def follower(self, request):
-        users = request.user.follower
-        serializers = UserSerializers(users, many=True, )
+    @action(detail=True)
+    def follower(self, request, pk=None):
+        user = get_object_or_404(User, id=pk)
+        users = User.objects.filter(
+            from_users_relation__to_user=user,
+            from_users_relation__related_type='f'
+        )
+        serializers = UserSerializers(users, many=True)
         return Response(serializers.data, status=status.HTTP_200_OK)
 
 
 class ProfileViewSet(mixins.RetrieveModelMixin, mixins.UpdateModelMixin, GenericViewSet):
     queryset = Profile.objects.all()
     serializer_class = ProfileSerializer
+    # permission_classes = (IsAuthenticated,)
 
 
 class RelationViewSet(ModelViewSet):
-    """
-    - 생성하면 from_user, to_user, related_type 받고 생성,
-    - 삭제는 삭제
-    - 업데이트는 기존에 있는 Relation을 가져와서, related_type 만 바꾼다.
-   """
     queryset = Relation.objects.all()
     serializer_class = RelationSerializer
+    # permission_classes = (IsAuthenticated,)
