@@ -47,17 +47,25 @@ class Profile(models.Model):
 
 
 class Relation(models.Model):
+    class choice_relations_type(models.TextChoices):
+        FOLLOW = 'f', _('Follow')
+        BLOCK = 'b', _('Block')
+        """
+        .labels ->> 외부에 보여지는 값 // ['Follow', 'Block'] 
+        .values ->> 데이터베이스에 저장 되는 값.// ['f', 'b']
+        .choices ->> 라벨, 벨류 값 같이 // [('f', 'Follow'), ('b', 'Block')]
+        .names ->> 클래스 변수 값 // ['FOLLOW', 'BLOCK']
+        """
 
-    # class choice_relations_type(models.TextChoices):
-    #     FOLLOW = 'f', _('follow')
-    #     BLOCK = 'b', _('block')
-
-    CHOICE_RELATIONS_TYPE = (('f', 'follow'), ('b', 'block'))
+    # CHOICE_RELATIONS_TYPE = (('f', 'follow'), ('b', 'block'))
     from_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='from_user_relations',
                                   related_query_name='from_users_relation')
     to_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='to_user_relations',
                                 related_query_name='to_users_relation')
-    related_type = models.CharField(choices=CHOICE_RELATIONS_TYPE, max_length=10)
+    related_type = models.CharField(choices=
+                                    choice_relations_type.choices,
+                                    # CHOICE_RELATIONS_TYPE,
+                                    max_length=10)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -81,14 +89,22 @@ class Relation(models.Model):
             self.from_user.profile.save()
             self.to_user.profile.save()
 
+        elif created is False and self.related_type == 'b':
+            # 팔로우를 건 유저의 팔로윙 카운트 증가
+            self.from_user.profile.follow_count = F('follow_count') - 1
+            self.to_user.profile.follower_count = F('follower_count') - 1
+            self.from_user.profile.save()
+            self.to_user.profile.save()
+
     def delete(self, *args, **kwargs):
         # from_user = get_object_or_404(User, pk=self.from_user_id)
         # to_user = get_object_or_404(User, pk=self.to_user_id)
 
+        super().delete(*args, **kwargs)
+
         if self.related_type == 'f':
             # 팔로우를 건 유저의 팔로윙 카운트 증가.
-            self.from_user.profile.follower_count = F('follower_count') - 1
-            self.to_user.profile.follow_count = F('follow_count') - 1
+            self.from_user.profile.follow_count = F('follow_count') - 1
+            self.to_user.profile.follower_count = F('follower_count') - 1
             self.from_user.profile.save()
             self.to_user.profile.save()
-        return super().save(*args, **kwargs)

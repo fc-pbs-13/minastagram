@@ -137,7 +137,7 @@ class RelationTest(APITestCase):
             'to_user': self.user1.id,
             'related_type': 'f'
         }
-        response = self.client.post(f'/users/{self.user1.id}/relation/', data=data)
+        response = self.client.post(f'/relation/', data=data)
         self.assertTrue(response.status_code, status.HTTP_201_CREATED)
 
     def test_destroy(self):
@@ -147,12 +147,12 @@ class RelationTest(APITestCase):
             'to_user': self.user1.id,
             'related_type': 'f'
         }
-        response_post = self.client.post(f'/users/{self.user1.id}/relation/', data=data)
+        response_post = self.client.post(f'/relation/', data=data)
         self.assertTrue(response_post.status_code, status.HTTP_201_CREATED)
         a = response_post.data['id']
         # print('dadaadada', a)
 
-        response = self.client.delete(f'/users/{self.user1.id}/relation/{a}/')
+        response = self.client.delete(f'/relation/{a}/')
         self.assertTrue(response.status_code, status.HTTP_201_CREATED)
 
     def test_update(self):
@@ -174,7 +174,7 @@ class RelationTest(APITestCase):
         data2 = {
             'related_type': 'f'
         }
-        response = self.client.patch(f'/users/{user2.id}/relation/{relation.id}/', data=data2)
+        response = self.client.patch(f'/relation/{relation.id}/', data=data2)
         # print('rerererererere', response.data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
@@ -211,4 +211,13 @@ class RelationTest(APITestCase):
 
         self.assertEqual(len(response.data), from_user_size)
 
-        self.fail()
+
+    # def test_block(self):
+    #     self.client.force_authenticate(user=self.user)
+    #     to_user = baker.make('users.User')
+    #     relation = baker.make('users.Relation', from_user=self.user, to_user=to_user, related_type='b')
+    #
+    #     response = self.client.delete(f'/relation/{relation.id}/')
+    #     print('232323232323323', relation)
+    #
+    #     self.fail()

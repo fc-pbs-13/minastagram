@@ -9,6 +9,7 @@ class UserSerializers(serializers.ModelSerializer):
         model = User
         fields = ['id', 'username', 'password']
         extra_kwargs = {'password': {'write_only': True}}
+
         # 필드에 임의의 추가 키워드 인수를 지정할 수 있는 단축키. serializer에서 필드를 명시적으로 선언 할 필요가 없음을 의미
 
         def create(self, validated_data):
