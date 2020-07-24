@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from rest_framework.serializers import ModelSerializer
 from posts.models import Post, Comment
+from users.serializers import UserSerializers
 
 
 class RecursiveSerializer(serializers.Serializer):
@@ -37,3 +38,18 @@ class PostSerializer(ModelSerializer):
 
     def get_like_users(self, obj):
         return obj.like_users.count()
+
+    def create(self, validated_data):
+        # Post model --> save()
+        context = validated_data.pop('context')
+        return super().create(validated_data)
+
+
+class PostProfileSerializers(serializers.ModelSerializer):
+    # image = PostSerializer(many=True, )
+    owner = UserSerializers()
+    comments = CommentSerializer(many=True, read_only=True,)
+
+    class Meta:
+        model = Post
+        fields = ['id', 'owner', 'image', 'text', 'created_date', 'comments', 'like_users']

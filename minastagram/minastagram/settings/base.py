@@ -48,6 +48,8 @@ INSTALLED_APPS = [
     'posts',
     'rest_framework.authtoken',
     'mptt',
+
+    'django_extensions',
 ]
 
 MIDDLEWARE = [

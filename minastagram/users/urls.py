@@ -9,11 +9,11 @@ router.register(r'users', UserViewSet)
 router.register(r'posts', PostViewSet)
 router.register(r'profile', ProfileViewSet)
 router.register(r'comments', CommentViewSet)
+router.register(r'relation', RelationViewSet)
 
 users_router = routers.NestedSimpleRouter(router, r'users', lookup='user')
 users_router.register(r'posts', PostViewSet)
 users_router.register(r'profile', ProfileViewSet)
-users_router.register(r'relation', RelationViewSet)
 
 
 posts_router = routers.NestedSimpleRouter(router, r'posts', lookup='post')
@@ -21,6 +21,9 @@ posts_router.register(r'comments', CommentViewSet)
 
 comment_router = routers.NestedSimpleRouter(router, r'comments', lookup='comment')
 comment_router.register(r'reply', CommentViewSet)
+
+
+# relation_router = routers.NestedSimpleRouter(router, r'relation', lookup='comment')
 
 urlpatterns = (
     url(r'^', include(router.urls)),
