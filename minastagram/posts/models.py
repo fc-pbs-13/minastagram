@@ -16,10 +16,13 @@ class Comment(MPTTModel):
     parent = TreeForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='reply')
     author = models.ForeignKey(User, on_delete=models.CASCADE, )
     post = models.ForeignKey(Post, on_delete=models.CASCADE,
-                                # related name, related_query_name 은 역방향 테이블을 위한 값.
+                             # related name, related_query_name 은 역방향 테이블을 위한 값.
                              related_name='comments',
                              null=True, blank=True)
-
-
     text = models.TextField()
     created_date = models.DateTimeField(auto_now_add=True)
+
+
+class Tag(models.Model):
+    name = models.CharField(max_length=20, unique=True, )
+    count = models.IntegerField(default=0)

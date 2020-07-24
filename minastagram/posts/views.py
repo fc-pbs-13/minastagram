@@ -80,3 +80,4 @@ class CommentViewSet(viewsets.ModelViewSet):
             )
         else:
             raise serializers.ValidationError('대댓글만 작성 가능')
+
